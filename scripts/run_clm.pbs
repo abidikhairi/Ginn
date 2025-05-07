@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N protein_clm_training          
+#PBS -q A100
+#PBS -l select=1:ncpus=32 
+#PBS -l walltime=24:00:00    
+#PBS -o outputs/clm_output.txt
+#PBS -e outputs/clm_error.txt
+
+# Load necessary modules
+module use /app/utils/modules && module load anaconda3-2022
+source activate MyPytorch2.0
+
+JOB_HOME_DIR="$HOME/src/python/"
+
+cd $JOB_HOME_DIR
+
+# Run your Python program
+accelerate launch training/run_clm.py
+
+conda deactivate
+module purge

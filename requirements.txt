@@ -1,0 +1,6 @@
+transformers
+peft
+accelerate
+deepspeed
+tiktoken
+blobfile
