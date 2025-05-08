@@ -50,8 +50,8 @@ def main(args):
 
     logger.info(f"Saving models to {model_path}")    
     tokenizer.save_pretrained(f'{model_path}/{MODEL_NAME}')
-    model.save_pretrained(f'{model_path}/{MODEL_NAME}')
-    adapter.save_pretrained(f'{model_path}/{MODEL_NAME}')
+    model.save_pretrained(f'{model_path}/{MODEL_NAME}', safe_serialization=False)
+    adapter.save_pretrained(f'{model_path}/{MODEL_NAME}', safe_serialization=False)
 
 
 if __name__ == '__main__':

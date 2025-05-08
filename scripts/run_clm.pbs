@@ -15,7 +15,15 @@ JOB_HOME_DIR="$HOME/src/python/"
 cd $JOB_HOME_DIR
 
 # Run your Python program
-accelerate launch training/run_clm.py
+accelerate launch training/run_clm.py --run_name SmolLM2-1.7B-Instruct-CPPT \
+    --lora_model_path /ddn/data/fcit/jghazialharbi/models/SmolLM2-1.7B-Instruct \
+    --dataset_path /ddn/data/fcit/jghazialharbi/data/uniref50 \
+    --output_dir /ddn/data/fcit/jghazialharbi/experim/SmolLM2-1.7B \
+    --text_column sequence \
+    --per_device_train_batch_size 4 \
+    --per_device_eval_batch_size 4 \
+    --num_train_epochs 1 \
+    --lr 0.0003
 
 conda deactivate
 module purge

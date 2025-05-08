@@ -2,6 +2,9 @@
 configs/
 outputs/
 
+# PBS scripts contains sensitive data
+scripts/*.pbs
+
 # Test files 
 _*.py
 
