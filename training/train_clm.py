@@ -35,7 +35,8 @@ logger.setLevel(logging.INFO)
 @dataclass
 class ScriptArguments:
     run_name: str = field(default="SmolLM2-1.7B-Instruct-CPPT")
-    lora_model_path: str = field(default="./outputs/mlm")  # path to LoRA-adapted model
+    base_model_path: str = field(default="./outputs/base-mlm")  # path to Base model
+    lora_model_path: str = field(default="./outputs/lora-mlm")  # path to LoRA-adapted model
     dataset_path: str = field(default="data/sequences.csv")
     text_column: str = field(default="sequence")
     output_dir: str = field(default="./outputs/clm")
@@ -46,15 +47,16 @@ class ScriptArguments:
 
 def main():
     parser = HfArgumentParser(ScriptArguments)
-    args = parser.parse_args_into_dataclasses()[0]
+    args: ScriptArguments = parser.parse_args_into_dataclasses()[0]
 
     ############################
     ## Load model & tokenizer ##
     ############################
-    tokenizer = AutoTokenizer.from_pretrained(args.lora_model_path)
-    config = PeftConfig.from_pretrained(args.lora_model_path)
-    model = AutoModelForCausalLM.from_pretrained(args.lora_model_path)
-    model = PeftModel(model, config)
+    tokenizer = AutoTokenizer.from_pretrained(args.base_model_path)
+    model = AutoModelForCausalLM.from_pretrained(args.base_model_path)
+    model = PeftModel.from_pretrained(model, args.lora_model_path, is_trainable=True)
+
+    model.print_trainable_parameters()
     
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -77,7 +79,7 @@ def main():
     ## Load Data ##
     ###############
     train_dataset = Dataset.from_csv(f'{args.dataset_path}/train.csv').select(range(10000))
-    eval_dataset = Dataset.from_csv(f'{args.dataset_path}/validation.csv').select(range(5000))
+    eval_dataset = Dataset.from_csv(f'{args.dataset_path}/validation.csv')
     
     train_dataset = train_dataset.map(tokenize_fn, batched=True, remove_columns=train_dataset.column_names)
     eval_dataset = eval_dataset.map(tokenize_fn, batched=True, remove_columns=eval_dataset.column_names)
@@ -87,7 +89,7 @@ def main():
         per_device_train_batch_size=args.per_device_train_batch_size,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
         num_train_epochs=args.num_train_epochs,
-        evaluation_strategy=EvaluationStrategy.STEPS,
+        eval_strategy=EvaluationStrategy.STEPS,
         save_strategy=SaveStrategy.STEPS,
         logging_steps=100,
         save_steps=500,
@@ -108,6 +110,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         data_collator=data_collator,
     )
 

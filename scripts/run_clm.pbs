@@ -16,7 +16,8 @@ cd $JOB_HOME_DIR
 
 # Run your Python program
 accelerate launch training/run_clm.py --run_name SmolLM2-1.7B-Instruct-CPPT \
-    --lora_model_path /ddn/data/fcit/jghazialharbi/models/SmolLM2-1.7B-Instruct \
+    --base_model_path /ddn/data/fcit/jghazialharbi/models/base/SmolLM2-1.7B-Instruct \
+    --lora_model_path /ddn/data/fcit/jghazialharbi/models/adapter/SmolLM2-1.7B-Instruct \
     --dataset_path /ddn/data/fcit/jghazialharbi/data/uniref50 \
     --output_dir /ddn/data/fcit/jghazialharbi/experim/SmolLM2-1.7B \
     --text_column sequence \
