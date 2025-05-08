@@ -49,9 +49,9 @@ def main(args):
     adapter.print_trainable_parameters()
 
     logger.info(f"Saving models to {model_path}")    
-    tokenizer.save_pretrained(f'{model_path}/{MODEL_NAME}')
-    model.save_pretrained(f'{model_path}/{MODEL_NAME}', safe_serialization=False)
-    adapter.save_pretrained(f'{model_path}/{MODEL_NAME}', safe_serialization=False)
+    tokenizer.save_pretrained(f'{model_path}/base/{MODEL_NAME}')
+    model.save_pretrained(f'{model_path}/base/{MODEL_NAME}', safe_serialization=False)
+    adapter.save_pretrained(f'{model_path}/adapter/{MODEL_NAME}', safe_serialization=False)
 
 
 if __name__ == '__main__':
