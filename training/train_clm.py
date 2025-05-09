@@ -23,6 +23,8 @@ from transformers.training_args import (
 )
 from peft import PeftConfig, PeftModel
 
+from callbacks import GenerateProteinsCallback
+
 
 # Setup logging
 logging.basicConfig(
@@ -122,12 +124,19 @@ def main():
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
+    callbacks = []
+    
+    if args.modality == 'protein':
+        generate_proteins_callback = GenerateProteinsCallback(tokenizer=tokenizer, output_dir=args.output_dir)
+        callbacks.append(generate_proteins_callback)
+        
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        callbacks=callbacks
     )
 
     trainer.train()
