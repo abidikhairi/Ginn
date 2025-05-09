@@ -42,6 +42,7 @@ class ScriptArguments:
     output_dir: str = field(default="./outputs/clm")
     per_device_train_batch_size: int = field(default=4)
     per_device_eval_batch_size: int = field(default=4)
+    gradient_accumulation_steps: int = field(default=4)
     num_train_epochs: int = field(default=1)
     lr: float = field(default=3e-4)
 
@@ -89,6 +90,7 @@ def main():
         per_device_train_batch_size=args.per_device_train_batch_size,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
         num_train_epochs=args.num_train_epochs,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
         eval_strategy=EvaluationStrategy.STEPS,
         save_strategy=SaveStrategy.STEPS,
         logging_steps=100,
