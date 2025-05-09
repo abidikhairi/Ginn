@@ -120,6 +120,7 @@ def main():
         learning_rate=args.lr,
         warmup_ratio=0.1,
         run_name=args.run_name,
+        save_total_limit=3
     )
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
