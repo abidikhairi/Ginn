@@ -27,7 +27,11 @@ def main(args):
     
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
     model = LlamaForCausalLM.from_pretrained(MODEL_ID)
-
+    
+    # Base model should be saved before injecting LoRa weights as it changes the reference
+    tokenizer.save_pretrained(f'{model_path}/base/{MODEL_NAME}')
+    model.save_pretrained(f'{model_path}/base/{MODEL_NAME}')
+    
     target_modules = [
         'q_proj', 'k_proj', 'v_proj', 'o_proj', # self attention layer
         'gate_proj', 'up_proj', 'down_proj', # mlp layer
@@ -49,8 +53,6 @@ def main(args):
     adapter.print_trainable_parameters()
 
     logger.info(f"Saving models to {model_path}")    
-    tokenizer.save_pretrained(f'{model_path}/base/{MODEL_NAME}')
-    model.save_pretrained(f'{model_path}/base/{MODEL_NAME}', safe_serialization=False)
     adapter.save_pretrained(f'{model_path}/adapter/{MODEL_NAME}', safe_serialization=False)
 
 
