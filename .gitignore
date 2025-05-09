@@ -1,3 +1,6 @@
+# Local files to experiment
+_local/
+
 # Models config and PBS output
 configs/
 outputs/

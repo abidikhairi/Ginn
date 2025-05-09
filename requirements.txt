@@ -4,3 +4,4 @@ accelerate
 deepspeed
 tiktoken
 blobfile
+liger-kernel
