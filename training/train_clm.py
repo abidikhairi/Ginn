@@ -3,6 +3,7 @@
 import sys
 import logging
 from dataclasses import dataclass, field
+from typing import Literal
 
 from datasets import Dataset
 from transformers import (
@@ -45,6 +46,7 @@ class ScriptArguments:
     gradient_accumulation_steps: int = field(default=4)
     num_train_epochs: int = field(default=1)
     lr: float = field(default=3e-4)
+    modality: Literal['text', 'protein'] = field(default='protein')
 
 def main():
     parser = HfArgumentParser(ScriptArguments)
@@ -60,9 +62,10 @@ def main():
     model.print_trainable_parameters()
     
     if tokenizer.pad_token is None:
+        # when doing this, no need to explicitly add eos_token at the end of text.
         tokenizer.pad_token = tokenizer.eos_token
 
-    def tokenize_fn(examples):
+    def tokenize_protein_fn(examples):
         def format_input(sequence: str) -> str:
             sequence = sequence.upper()
             sequence = " ".join(list(sequence))
@@ -75,6 +78,15 @@ def main():
             padding=True,
             truncation=True,
         )
+        
+    def tokenize_text_fn(examples):
+        text = [i for i in examples[args.text_column]]
+        return tokenizer(
+            text,
+            padding=True,
+            truncation=True,
+            max_length=256
+        )
 
     ###############
     ## Load Data ##
@@ -82,8 +94,10 @@ def main():
     train_dataset = Dataset.from_csv(f'{args.dataset_path}/train.csv').select(range(10000))
     eval_dataset = Dataset.from_csv(f'{args.dataset_path}/validation.csv')
     
-    train_dataset = train_dataset.map(tokenize_fn, batched=True, remove_columns=train_dataset.column_names)
-    eval_dataset = eval_dataset.map(tokenize_fn, batched=True, remove_columns=eval_dataset.column_names)
+    tokenization_fn = tokenize_text_fn if args.modality == 'text' else tokenize_protein_fn
+    
+    train_dataset = train_dataset.map(tokenization_fn, batched=True, remove_columns=train_dataset.column_names)
+    eval_dataset = eval_dataset.map(tokenization_fn, batched=True, remove_columns=eval_dataset.column_names)
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,
