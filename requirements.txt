@@ -1,5 +1,6 @@
 transformers
 peft
+trl
 accelerate
 deepspeed
 tiktoken
