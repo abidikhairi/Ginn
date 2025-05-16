@@ -6,3 +6,5 @@ deepspeed
 tiktoken
 blobfile
 liger-kernel
+wandb
+datasets
