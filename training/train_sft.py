@@ -17,6 +17,7 @@ from transformers.training_args import (
     SchedulerType,
     is_torch_bf16_gpu_available,
 )
+from peft import PeftModel
 from trl import SFTConfig, SFTTrainer
 
 from callbacks import ModelInferenceCallback 
@@ -57,8 +58,9 @@ def main():
     ############################
     tokenizer = AutoTokenizer.from_pretrained(args.base_model_path)
     model = AutoModelForCausalLM.from_pretrained(args.base_model_path)
+    model = PeftModel.from_pretrained(model, args.lora_adapter_path, is_trainable=True)
     
-    # model.load_adapter(args.lora_adapter_path)
+    model.print_trainable_parameters()
     
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
